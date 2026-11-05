@@ -1,13 +1,15 @@
 import React from 'react';
-import { ShoppingBag, Search, Compass, PackageCheck, Smartphone, Monitor } from 'lucide-react';
+import { ShoppingBag, Search, Compass, PackageCheck, Smartphone, Monitor, Heart } from 'lucide-react';
 import { CartItem, Order } from '../types/ecommerce';
 
 interface NavbarProps {
   cart: CartItem[];
   orders: Order[];
   activeOrder: Order | null;
+  wishlistCount: number;
   onOpenCart: () => void;
   onOpenOrders: () => void;
+  onOpenWishlist: () => void;
   onOpenTracking: (order: Order) => void;
   onSelectCategory: (category: string) => void;
   selectedCategory: string;
@@ -21,8 +23,10 @@ export const Navbar: React.FC<NavbarProps> = ({
   cart,
   orders,
   activeOrder,
+  wishlistCount,
   onOpenCart,
   onOpenOrders,
+  onOpenWishlist,
   onOpenTracking,
   onSelectCategory,
   selectedCategory,
@@ -152,6 +156,19 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <Smartphone className="w-3.5 h-3.5 text-stone-700" />
                   <span className="whitespace-nowrap">Mobile Frame</span>
                 </>
+              )}
+            </button>
+
+            {/* Wishlist shortcut button */}
+            <button
+              onClick={onOpenWishlist}
+              className="p-2 text-stone-600 hover:text-stone-900 hover:bg-stone-100 rounded-full transition-colors cursor-pointer relative"
+              title={`Wishlist (${wishlistCount} saved items)`}
+              aria-label={`Wishlist with ${wishlistCount} items`}
+            >
+              <Heart className={`w-5 h-5 ${wishlistCount > 0 ? 'text-rose-600 fill-rose-50' : ''}`} />
+              {wishlistCount > 0 && (
+                <span className="absolute top-1 right-1 w-2 h-2 bg-rose-600 rounded-full ring-2 ring-white" />
               )}
             </button>
 

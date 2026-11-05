@@ -2,5 +2,7 @@
   "name": "Atelier Minimalist E-Commerce Store",
   "description": "Responsive, mobile-optimized boutique e-commerce storefront with intuitive navigation, rapid 1-click checkout, secure payment gateway, and live real-time order tracking.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

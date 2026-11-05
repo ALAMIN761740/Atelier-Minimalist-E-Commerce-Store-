@@ -99,3 +99,18 @@ export interface Order {
     driverProgressPercent: number; // 0 to 100 on the route map
   };
 }
+
+export interface ProductReview {
+  id: string;
+  productId: string;
+  authorName: string;
+  rating: number;
+  title: string;
+  comment: string;
+  date: string;
+  isVerifiedPurchase: boolean;
+  helpfulCount: number;
+  recommended: boolean;
+  fitRating?: 'Runs Small' | 'True to Size' | 'Runs Large';
+}
+

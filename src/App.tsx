@@ -2,10 +2,11 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Sparkles, SlidersHorizontal, ArrowUpDown, ChevronDown, 
   Truck, ShieldCheck, RefreshCw, Heart, Eye, ArrowRight,
-  Smartphone, Monitor, Check
+  Smartphone, Monitor, Check, ShoppingBag
 } from 'lucide-react';
 import { PRODUCTS, HERO_IMAGE } from './data/products';
-import { Product, CartItem, Order } from './types/ecommerce';
+import { INITIAL_REVIEWS } from './data/reviews';
+import { Product, CartItem, Order, ProductReview } from './types/ecommerce';
 import { Navbar } from './components/Navbar';
 import { MobileBottomNav } from './components/MobileBottomNav';
 import { ProductCard } from './components/ProductCard';
@@ -14,6 +15,8 @@ import { CartDrawer } from './components/CartDrawer';
 import { CheckoutModal } from './components/CheckoutModal';
 import { OrderTrackingModal } from './components/OrderTrackingModal';
 import { OrderHistoryDrawer } from './components/OrderHistoryDrawer';
+import { WishlistDrawer } from './components/WishlistDrawer';
+import { WishlistSection } from './components/WishlistSection';
 
 export default function App() {
   // LocalStorage persistence for Cart, Orders, Wishlist
@@ -64,6 +67,7 @@ export default function App() {
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isOrdersOpen, setIsOrdersOpen] = useState(false);
   const [isTrackingOpen, setIsTrackingOpen] = useState(false);
+  const [isWishlistDrawerOpen, setIsWishlistDrawerOpen] = useState(false);
   const [activeTrackingOrder, setActiveTrackingOrder] = useState<Order | null>(null);
 
   // Promo Code State
@@ -71,10 +75,19 @@ export default function App() {
   const [promoDiscountRate, setPromoDiscountRate] = useState<number>(0.15); // default 15% discount for first-time visitors!
 
   // Mobile Bottom Nav Active Tab
-  const [mobileTab, setMobileTab] = useState<'shop' | 'search' | 'bag' | 'tracking' | 'orders'>('shop');
+  const [mobileTab, setMobileTab] = useState<'shop' | 'search' | 'wishlist' | 'bag' | 'tracking' | 'orders'>('shop');
   
   // Desktop simulator for Mobile Device Frame
   const [isMobilePreview, setIsMobilePreview] = useState(false);
+
+  const [reviews, setReviews] = useState<ProductReview[]>(() => {
+    try {
+      const saved = localStorage.getItem('atelier_product_reviews');
+      return saved ? JSON.parse(saved) : INITIAL_REVIEWS;
+    } catch {
+      return INITIAL_REVIEWS;
+    }
+  });
 
   // Sync to localStorage
   useEffect(() => {
@@ -88,6 +101,10 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('atelier_wishlist', JSON.stringify(wishlist));
   }, [wishlist]);
+
+  useEffect(() => {
+    localStorage.setItem('atelier_product_reviews', JSON.stringify(reviews));
+  }, [reviews]);
 
   // Set latest active order for tracking if available
   const activeOrder = useMemo(() => {
@@ -155,6 +172,45 @@ export default function App() {
     );
   };
 
+  const handleRemoveFromWishlist = (productId: string) => {
+    setWishlist(prev => prev.filter(id => id !== productId));
+  };
+
+  const handleMoveToCart = (product: Product, color?: string, size?: string) => {
+    const selectedColor = color || product.colors[0]?.name || 'Standard';
+    const selectedSize = size || product.sizes[0] || 'Standard';
+    handleAddToCart(product, selectedColor, selectedSize, 1);
+  };
+
+  const handleMoveAllToCart = (productsToMove: Product[]) => {
+    productsToMove.forEach(product => {
+      const selectedColor = product.colors[0]?.name || 'Standard';
+      const selectedSize = product.sizes[0] || 'Standard';
+      handleAddToCart(product, selectedColor, selectedSize, 1);
+    });
+    setIsCartOpen(true);
+  };
+
+  const handleAddReview = (reviewData: {
+    productId: string;
+    authorName: string;
+    rating: number;
+    title: string;
+    comment: string;
+    isVerifiedPurchase: boolean;
+    recommended: boolean;
+    fitRating?: 'Runs Small' | 'True to Size' | 'Runs Large';
+  }) => {
+    const newReview: ProductReview = {
+      id: `rev-${Date.now()}`,
+      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      helpfulCount: 0,
+      ...reviewData
+    };
+
+    setReviews(prev => [newReview, ...prev]);
+  };
+
   const handleApplyPromo = (code: string): boolean => {
     const cleaned = code.trim().toUpperCase();
     if (cleaned === 'SAVE15') {
@@ -185,7 +241,7 @@ export default function App() {
   };
 
   // Handle Mobile Bottom Nav Tab Selection
-  const handleMobileTabSelect = (tab: 'shop' | 'search' | 'bag' | 'tracking' | 'orders') => {
+  const handleMobileTabSelect = (tab: 'shop' | 'search' | 'wishlist' | 'bag' | 'tracking' | 'orders') => {
     setMobileTab(tab);
     if (tab === 'shop') {
       setSelectedCategory('All');
@@ -194,6 +250,8 @@ export default function App() {
       const searchElem = document.getElementById('search-catalog-input');
       searchElem?.focus();
       window.scrollTo({ top: 350, behavior: 'smooth' });
+    } else if (tab === 'wishlist') {
+      setIsWishlistDrawerOpen(true);
     } else if (tab === 'bag') {
       setIsCartOpen(true);
     } else if (tab === 'tracking') {
@@ -217,8 +275,10 @@ export default function App() {
         cart={cart}
         orders={orders}
         activeOrder={activeOrder}
+        wishlistCount={wishlist.length}
         onOpenCart={() => setIsCartOpen(true)}
         onOpenOrders={() => setIsOrdersOpen(true)}
+        onOpenWishlist={() => setIsWishlistDrawerOpen(true)}
         onOpenTracking={(order) => {
           setActiveTrackingOrder(order);
           setIsTrackingOpen(true);
@@ -353,23 +413,25 @@ export default function App() {
           </div>
         </section>
 
-        {/* CATALOG COLLECTION SECTION */}
+        {/* CATALOG COLLECTION & WISHLIST SECTION */}
         <section id="collection-grid" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
           
           {/* Header & Controls Strip */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-stone-200">
             <div>
               <h2 className="text-xl sm:text-2xl font-bold text-stone-900 font-display">
-                Featured Collection
+                {selectedCategory === 'Wishlist' ? 'Your Saved Wishlist' : 'Featured Collection'}
               </h2>
               <p className="text-xs text-stone-500 mt-1">
-                Showing {filteredProducts.length} handcrafted essentials
+                {selectedCategory === 'Wishlist'
+                  ? `${wishlist.length} items liked · Ready to purchase`
+                  : `Showing ${filteredProducts.length} handcrafted essentials`}
               </p>
             </div>
 
             {/* Interactive Filter Tabs (Segmented Control) */}
             <div className="flex flex-wrap items-center gap-2">
-              <div className="flex items-center p-1 bg-stone-200/70 rounded-xl overflow-x-auto max-w-full">
+              <div className="flex items-center p-1 bg-stone-200/70 rounded-xl overflow-x-auto max-w-full gap-1">
                 {(['All', 'Apparel', 'Footwear', 'Accessories', 'Lifestyle'] as const).map((cat) => (
                   <button
                     key={cat}
@@ -383,28 +445,61 @@ export default function App() {
                     {cat}
                   </button>
                 ))}
+
+                {/* Dedicated Wishlist Tab */}
+                <button
+                  onClick={() => setSelectedCategory('Wishlist')}
+                  className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                    selectedCategory === 'Wishlist'
+                      ? 'bg-rose-600 text-white shadow-xs'
+                      : 'text-stone-600 hover:text-stone-900'
+                  }`}
+                  aria-label={`Wishlist with ${wishlist.length} saved items`}
+                >
+                  <Heart className={`w-3.5 h-3.5 ${selectedCategory === 'Wishlist' ? 'fill-current' : 'text-rose-500'}`} />
+                  <span>Wishlist</span>
+                  {wishlist.length > 0 && (
+                    <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold tabular-nums ${
+                      selectedCategory === 'Wishlist' ? 'bg-white text-rose-700' : 'bg-rose-100 text-rose-700'
+                    }`}>
+                      {wishlist.length}
+                    </span>
+                  )}
+                </button>
               </div>
 
-              {/* Sorting Selector */}
-              <div className="relative flex items-center">
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as any)}
-                  className="appearance-none bg-white border border-stone-200 text-stone-800 text-xs font-medium py-2 pl-3 pr-8 rounded-xl outline-none hover:border-stone-400 cursor-pointer"
-                  aria-label="Sort products"
-                >
-                  <option value="popular">Most Popular</option>
-                  <option value="rating">Highest Rated</option>
-                  <option value="price-asc">Price: Low to High</option>
-                  <option value="price-desc">Price: High to Low</option>
-                </select>
-                <ChevronDown className="w-3.5 h-3.5 text-stone-400 absolute right-2.5 pointer-events-none" />
-              </div>
+              {/* Sorting Selector (hidden on Wishlist tab) */}
+              {selectedCategory !== 'Wishlist' && (
+                <div className="relative flex items-center">
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value as any)}
+                    className="appearance-none bg-white border border-stone-200 text-stone-800 text-xs font-medium py-2 pl-3 pr-8 rounded-xl outline-none hover:border-stone-400 cursor-pointer"
+                    aria-label="Sort products"
+                  >
+                    <option value="popular">Most Popular</option>
+                    <option value="rating">Highest Rated</option>
+                    <option value="price-asc">Price: Low to High</option>
+                    <option value="price-desc">Price: High to Low</option>
+                  </select>
+                  <ChevronDown className="w-3.5 h-3.5 text-stone-400 absolute right-2.5 pointer-events-none" />
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Product Cards Grid (3-column desktop, 2-column mobile/tablet) */}
-          {filteredProducts.length === 0 ? (
+          {/* DEDICATED WISHLIST VIEW OR PRODUCT CARDS GRID */}
+          {selectedCategory === 'Wishlist' ? (
+            <WishlistSection
+              wishlistProductIds={wishlist}
+              allProducts={PRODUCTS}
+              onRemoveFromWishlist={handleRemoveFromWishlist}
+              onMoveToCart={handleMoveToCart}
+              onMoveAllToCart={handleMoveAllToCart}
+              onOpenProductDetail={(p) => setSelectedProduct(p)}
+              onExploreCatalog={() => setSelectedCategory('All')}
+            />
+          ) : filteredProducts.length === 0 ? (
             <div className="py-20 text-center text-stone-500">
               <p className="text-sm font-semibold">No items match your selected filters.</p>
               <button
@@ -418,18 +513,56 @@ export default function App() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mt-8">
-              {filteredProducts.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  onSelect={(p) => setSelectedProduct(p)}
-                  onQuickAdd={handleQuickAdd}
-                  isWishlisted={wishlist.includes(product.id)}
-                  onToggleWishlist={handleToggleWishlist}
-                />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mt-8">
+                {filteredProducts.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    onSelect={(p) => setSelectedProduct(p)}
+                    onQuickAdd={handleQuickAdd}
+                    isWishlisted={wishlist.includes(product.id)}
+                    onToggleWishlist={handleToggleWishlist}
+                  />
+                ))}
+              </div>
+
+              {/* Wishlist Spotlight Banner (if user has items saved and is browsing catalog) */}
+              {wishlist.length > 0 && (
+                <div className="mt-10 p-4 sm:p-5 rounded-2xl bg-rose-50/70 border border-rose-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                      <Heart className="w-5 h-5 fill-current" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs sm:text-sm font-bold text-stone-900">
+                        You have {wishlist.length} {wishlist.length === 1 ? 'item' : 'items'} saved in your Wishlist
+                      </h4>
+                      <p className="text-xs text-stone-500">
+                        Move all liked pieces directly to your cart or review your saved items.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <button
+                      onClick={() => handleMoveAllToCart(PRODUCTS.filter(p => wishlist.includes(p.id)))}
+                      className="flex-1 sm:flex-none px-4 py-2 bg-stone-900 text-white text-xs font-semibold rounded-lg hover:bg-stone-800 transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
+                    >
+                      <ShoppingBag className="w-3.5 h-3.5" />
+                      <span>Move All to Cart</span>
+                    </button>
+                    <button
+                      onClick={() => setSelectedCategory('Wishlist')}
+                      className="flex-1 sm:flex-none px-3.5 py-2 bg-white text-stone-800 border border-stone-200 hover:bg-stone-100 text-xs font-semibold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1"
+                    >
+                      <span>Open Wishlist</span>
+                      <ArrowRight className="w-3 h-3" />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
           )}
 
           {/* Quick Active Order Notification Bar (Adjacency & Quick Access) */}
@@ -538,6 +671,7 @@ export default function App() {
         cart={cart}
         orders={orders}
         activeOrder={activeOrder}
+        wishlistCount={wishlist.length}
         activeTab={mobileTab}
         onSelectTab={handleMobileTabSelect}
       />
@@ -548,6 +682,21 @@ export default function App() {
         onClose={() => setSelectedProduct(null)}
         onAddToCart={handleAddToCart}
         onInstantBuy={handleInstantBuy}
+        reviews={reviews}
+        onAddReview={handleAddReview}
+        userOrders={orders}
+      />
+
+      {/* WISHLIST DRAWER */}
+      <WishlistDrawer
+        isOpen={isWishlistDrawerOpen}
+        onClose={() => setIsWishlistDrawerOpen(false)}
+        wishlistProductIds={wishlist}
+        allProducts={PRODUCTS}
+        onRemoveFromWishlist={handleRemoveFromWishlist}
+        onMoveToCart={handleMoveToCart}
+        onMoveAllToCart={handleMoveAllToCart}
+        onOpenProductDetail={(p) => setSelectedProduct(p)}
       />
 
       {/* SHOPPING BAG DRAWER */}

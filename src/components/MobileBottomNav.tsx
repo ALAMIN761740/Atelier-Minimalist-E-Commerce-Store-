@@ -1,19 +1,21 @@
 import React from 'react';
-import { Home, Search, ShoppingBag, Truck, Clock } from 'lucide-react';
+import { Home, Heart, ShoppingBag, Truck, Clock } from 'lucide-react';
 import { CartItem, Order } from '../types/ecommerce';
 
 interface MobileBottomNavProps {
   cart: CartItem[];
   orders: Order[];
   activeOrder: Order | null;
-  activeTab: 'shop' | 'search' | 'bag' | 'tracking' | 'orders';
-  onSelectTab: (tab: 'shop' | 'search' | 'bag' | 'tracking' | 'orders') => void;
+  wishlistCount: number;
+  activeTab: 'shop' | 'search' | 'wishlist' | 'bag' | 'tracking' | 'orders';
+  onSelectTab: (tab: 'shop' | 'search' | 'wishlist' | 'bag' | 'tracking' | 'orders') => void;
 }
 
 export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   cart,
   orders,
   activeOrder,
+  wishlistCount,
   activeTab,
   onSelectTab
 }) => {
@@ -39,16 +41,23 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
           <span className="text-[10px] mt-0.5 tracking-tight">Shop</span>
         </button>
 
-        {/* Tab 2: Search */}
+        {/* Tab 2: Wishlist */}
         <button
-          onClick={() => onSelectTab('search')}
-          className={`flex flex-col items-center justify-center min-w-[54px] min-h-[46px] rounded-lg transition-colors cursor-pointer ${
-            activeTab === 'search' ? 'text-stone-900 font-semibold' : 'text-stone-500 hover:text-stone-800'
+          onClick={() => onSelectTab('wishlist')}
+          className={`relative flex flex-col items-center justify-center min-w-[54px] min-h-[46px] rounded-lg transition-colors cursor-pointer ${
+            activeTab === 'wishlist' ? 'text-rose-600 font-semibold' : 'text-stone-500 hover:text-stone-800'
           }`}
-          aria-label="Search and Filter"
+          aria-label={`Wishlist with ${wishlistCount} items`}
         >
-          <Search className={`w-5 h-5 ${activeTab === 'search' ? 'stroke-[2.2]' : 'stroke-[1.6]'}`} />
-          <span className="text-[10px] mt-0.5 tracking-tight">Search</span>
+          <div className="relative">
+            <Heart className={`w-5 h-5 ${activeTab === 'wishlist' ? 'fill-rose-500 stroke-rose-600' : 'stroke-[1.6]'}`} />
+            {wishlistCount > 0 && (
+              <span className="absolute -top-1 -right-2 bg-rose-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center tabular-nums">
+                {wishlistCount}
+              </span>
+            )}
+          </div>
+          <span className="text-[10px] mt-0.5 tracking-tight">Saved</span>
         </button>
 
         {/* Tab 3: Bag */}
