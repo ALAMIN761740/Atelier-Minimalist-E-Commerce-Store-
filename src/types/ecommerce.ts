@@ -16,6 +16,9 @@ export interface Product {
   tag?: string;
   image: string;
   gallery: string[];
+  featured?: boolean;
+  isBestSeller?: boolean;
+  isNewArrival?: boolean;
 }
 
 export interface CartItem {
@@ -114,3 +117,49 @@ export interface ProductReview {
   fitRating?: 'Runs Small' | 'True to Size' | 'Runs Large';
 }
 
+export interface User {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  name?: string;
+  phone?: string;
+  defaultAddress?: ShippingAddress;
+  createdAt: string;
+  loyaltyTier: 'Silver Collector' | 'Gold Atelier' | 'Platinum Connoisseur';
+}
+
+export type PageRoute = 
+  | 'home' 
+  | 'shop' 
+  | 'product-detail' 
+  | 'categories' 
+  | 'search' 
+  | 'cart' 
+  | 'wishlist' 
+  | 'checkout' 
+  | 'login' 
+  | 'register' 
+  | 'profile' 
+  | 'orders' 
+  | 'about' 
+  | 'contact' 
+  | 'faq' 
+  | '404';
+
+export interface ToastNotification {
+  id: string;
+  type: 'success' | 'info' | 'error';
+  title: string;
+  message?: string;
+  duration?: number;
+}
+
+export interface ContactMessage {
+  id: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  createdAt: string;
+}

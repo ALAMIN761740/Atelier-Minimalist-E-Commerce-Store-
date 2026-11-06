@@ -1,6 +1,6 @@
-import { Product, ShippingMethod } from '../types/ecommerce';
+import { Product, ShippingMethod, User } from '../types/ecommerce';
 
-export const HERO_IMAGE = '/src/assets/images/hero_fashion_minimal_1793895538299.jpg';
+export const HERO_IMAGE = '/images/hero/hero-fashion-minimal.jpg';
 
 export const PRODUCTS: Product[] = [
   {
@@ -23,9 +23,11 @@ export const PRODUCTS: Product[] = [
     stock: 14,
     inStock: true,
     tag: 'Best Seller',
-    image: '/src/assets/images/product_merino_knit_1793895538092.jpg',
+    featured: true,
+    isBestSeller: true,
+    image: '/images/products/product-merino-knit.jpg',
     gallery: [
-      '/src/assets/images/product_merino_knit_1793895538092.jpg'
+      '/images/products/product-merino-knit.jpg'
     ]
   },
   {
@@ -48,9 +50,11 @@ export const PRODUCTS: Product[] = [
     stock: 6,
     inStock: true,
     tag: 'Handcrafted',
-    image: '/src/assets/images/product_leather_tote_1793895539192.jpg',
+    featured: true,
+    isBestSeller: true,
+    image: '/images/products/product-leather-tote.jpg',
     gallery: [
-      '/src/assets/images/product_leather_tote_1793895539192.jpg'
+      '/images/products/product-leather-tote.jpg'
     ]
   },
   {
@@ -72,9 +76,11 @@ export const PRODUCTS: Product[] = [
     stock: 9,
     inStock: true,
     tag: 'New Release',
-    image: '/src/assets/images/product_minimal_sneaker_1793895540209.jpg',
+    featured: true,
+    isNewArrival: true,
+    image: '/images/products/product-minimal-sneaker.jpg',
     gallery: [
-      '/src/assets/images/product_minimal_sneaker_1793895540209.jpg'
+      '/images/products/product-minimal-sneaker.jpg'
     ]
   },
   {
@@ -96,9 +102,11 @@ export const PRODUCTS: Product[] = [
     stock: 22,
     inStock: true,
     tag: 'Artisan Batch',
-    image: '/src/assets/images/product_ceramic_mug_1793895540226.jpg',
+    featured: true,
+    isNewArrival: true,
+    image: '/images/products/product-ceramic-mug.jpg',
     gallery: [
-      '/src/assets/images/product_ceramic_mug_1793895540226.jpg'
+      '/images/products/product-ceramic-mug.jpg'
     ]
   },
   {
@@ -119,9 +127,10 @@ export const PRODUCTS: Product[] = [
     sizes: ['XS', 'S', 'M', 'L', 'XL'],
     stock: 18,
     inStock: true,
-    image: '/src/assets/images/product_merino_knit_1793895538092.jpg',
+    isNewArrival: true,
+    image: '/images/products/product-merino-knit.jpg',
     gallery: [
-      '/src/assets/images/product_merino_knit_1793895538092.jpg'
+      '/images/products/product-merino-knit.jpg'
     ]
   },
   {
@@ -142,10 +151,88 @@ export const PRODUCTS: Product[] = [
     sizes: ['One Size'],
     stock: 12,
     inStock: true,
-    image: '/src/assets/images/product_leather_tote_1793895539192.jpg',
+    isBestSeller: true,
+    image: '/images/products/product-leather-tote.jpg',
     gallery: [
-      '/src/assets/images/product_leather_tote_1793895539192.jpg'
+      '/images/products/product-leather-tote.jpg'
     ]
+  },
+  {
+    id: 'prod-07',
+    name: 'Tailored Pleated Virgin Wool Trouser',
+    category: 'Apparel',
+    price: 210,
+    originalPrice: 240,
+    rating: 4.89,
+    reviewsCount: 88,
+    description: 'Woven from fine Australian virgin wool with an architectural single pleat and relaxed straight taper. Features custom horn buttons, cotton pocket linings, and internal curtain waistband.',
+    material: '100% Virgin Worsted Wool (260 GSM)',
+    dimensions: 'Mid-rise with gentle taper. Standard 32" inseam with 2" let-out allowance.',
+    colors: [
+      { name: 'Deep Charcoal', hex: '#333333' },
+      { name: 'Warm Taupe', hex: '#8c827a' }
+    ],
+    sizes: ['28', '30', '32', '34', '36'],
+    stock: 11,
+    inStock: true,
+    featured: true,
+    image: '/images/products/product-merino-knit.jpg',
+    gallery: [
+      '/images/products/product-merino-knit.jpg'
+    ]
+  },
+  {
+    id: 'prod-08',
+    name: 'Solid Cast Bronze Incense Vessel',
+    category: 'Lifestyle',
+    price: 115,
+    rating: 4.96,
+    reviewsCount: 52,
+    description: 'Individually sand-cast from solid untreated bronze. Left unlacquered to develop a deep, organic golden-brown patina with continuous heat and handling over the decades.',
+    material: '100% Solid Sand-Cast Bronze, Felt Base Pad',
+    dimensions: '12cm diameter x 4cm height. Fits standard bamboo core or solid incense.',
+    colors: [
+      { name: 'Raw Sand-Cast Bronze', hex: '#cd7f32' }
+    ],
+    sizes: ['Standard'],
+    stock: 7,
+    inStock: true,
+    tag: 'Limited Foundry Run',
+    image: '/images/products/product-ceramic-mug.jpg',
+    gallery: [
+      '/images/products/product-ceramic-mug.jpg'
+    ]
+  }
+];
+
+export const CATEGORIES_DATA = [
+  {
+    id: 'Apparel',
+    name: 'Apparel & Knitwear',
+    itemCount: '3 Essentials',
+    description: 'Cashmere crewnecks, organic supima mocknecks, and pleated virgin wool trousers.',
+    image: '/images/products/product-merino-knit.jpg'
+  },
+  {
+    id: 'Accessories',
+    name: 'Leather Goods',
+    itemCount: '2 Essentials',
+    description: 'Vegetable-tanned French calfskin totes and RFID-shielded Badalassi wallets.',
+    image: '/images/products/product-leather-tote.jpg'
+  },
+  {
+    id: 'Footwear',
+    name: 'Artisanal Footwear',
+    itemCount: '1 Essential',
+    description: 'Strobel stitch calfskin sneakers with Italian suede mudguards and amber gum soles.',
+    image: '/images/products/product-minimal-sneaker.jpg'
+  },
+  {
+    id: 'Lifestyle',
+    name: 'Objects & Ceramics',
+    itemCount: '2 Essentials',
+    description: 'Hand-thrown terracotta pour-overs, Scandinavian oak plates, and cast bronze vessels.',
+    image: '/images/products/product-ceramic-mug.jpg'
   }
 ];
 
@@ -173,14 +260,25 @@ export const SHIPPING_METHODS: ShippingMethod[] = [
   }
 ];
 
-export const DEMO_ADDRESS = {
-  fullName: 'Elena Rostova',
+export const DEMO_USER: User = {
+  id: 'usr-9281',
   email: 'elena.rostova@atelier-example.com',
+  firstName: 'Elena',
+  lastName: 'Rostova',
   phone: '+1 (415) 890-4211',
-  street: '450 Townsend St',
-  apartment: 'Suite 3B',
-  city: 'San Francisco',
-  state: 'CA',
-  postalCode: '94107',
-  country: 'United States'
+  defaultAddress: {
+    fullName: 'Elena Rostova',
+    email: 'elena.rostova@atelier-example.com',
+    phone: '+1 (415) 890-4211',
+    street: '450 Townsend St',
+    apartment: 'Suite 3B',
+    city: 'San Francisco',
+    state: 'CA',
+    postalCode: '94107',
+    country: 'United States'
+  },
+  createdAt: '2025-10-14T09:00:00.000Z',
+  loyaltyTier: 'Platinum Connoisseur'
 };
+
+export const DEMO_ADDRESS = DEMO_USER.defaultAddress!;
